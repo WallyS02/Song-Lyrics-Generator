@@ -63,13 +63,13 @@ def main():
                     print(generated_lyrics)
             case 7:
                 path = os.path.dirname(os.path.abspath(__file__))
-                path = path + "\\Data\\"
-                pink_floyd_dataset = clean_data((path + "Pink Floyd.csv"))
-                black_sabbath_dataset = clean_data((path + "Black Sabbath.csv"))
-                pink_sabbath_dataset = clean_data((path + "Pink Sabbath.csv"))
-                paktofonika_dataset = clean_data((path + "Paktofonika.csv"))
-                bracia_figo_fagot_dataset = clean_data((path + "Bracia Figo Fagot.csv"))
-                braciofonika_pigo_pagot_dataset = clean_data((path + "Braciofonika Pigo Pagot.csv"))
+                path = os.path.join(path, "Data")
+                pink_floyd_dataset = clean_data(os.path.join(path, "Pink Floyd.csv"))
+                black_sabbath_dataset = clean_data(os.path.join(path, "Black Sabbath.csv"))
+                pink_sabbath_dataset = clean_data(os.path.join(path, "Pink Sabbath.csv"))
+                paktofonika_dataset = clean_data(os.path.join(path, "Paktofonika.csv"))
+                bracia_figo_fagot_dataset = clean_data(os.path.join(path, "Bracia Figo Fagot.csv"))
+                braciofonika_pigo_pagot_dataset = clean_data(os.path.join(path, "Braciofonika Pigo Pagot.csv"))
             case 8:
                 scrap_data(pink_floyd_selected_albums, black_sabbath_selected_albums, time_stamp)
             case 9:
