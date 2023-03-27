@@ -4,24 +4,8 @@ from bs4 import BeautifulSoup
 import requests
 import os
 import time
-import re
-from nltk.tokenize import word_tokenize
 from ScrapThread import ScrapThread
 from proxy_handling import proxies_validation
-
-
-def clean_data(name):
-    document = pd.read_csv(name, usecols=["Lyrics"])
-    rows = document["Lyrics"].values.tolist()
-    dataset = []
-    for lyric in rows:
-        lyric = lyric.lower()
-        lyric = re.sub(r"[,.\"\'!@#$%^&*(){}?/;`~:<>+=-\\]", "", lyric)
-        tokens = word_tokenize(lyric)
-        words = [word for word in tokens if word.isalpha()]
-        dataset += words
-    print(name.split('\\')[-1], ": ", len(dataset))
-    return dataset
 
 
 def connect(url, proxies_list):
@@ -156,19 +140,17 @@ def scrap_data(pink_floyd_selected_albums, black_sabbath_selected_albums, time_s
     proxies_list = proxies_validation()
     file = open("links.txt")
     path = os.path.dirname(os.path.abspath(__file__))
-    path = path + "\\Data\\"
-    file.readline()
-    file.readline()
-    paktofonika = do_threading(file.readline()[0:-1], [], 0.0, proxies_list)
-    figofagot = do_threading(file.readline(), [], 0.0, proxies_list)
-    braciofonika_pigo_pagot = pd.concat([paktofonika, figofagot], ignore_index=True)
-    paktofonika.to_csv((path + "Paktofonika.csv"))
-    figofagot.to_csv((path + "Bracia Figo Fagot.csv"))
-    braciofonika_pigo_pagot.to_csv((path + "Braciofonika Pigo Pagot.csv"))
+    path = os.path.join(path, "Data")
     pink_floyd_data_frame = do_threading(file.readline()[0:-1], pink_floyd_selected_albums, time_stamp, proxies_list)
     black_sabbath_data_frame = do_threading(file.readline(), black_sabbath_selected_albums, time_stamp, proxies_list)
     pink_sabbath_data_frame = pd.concat([pink_floyd_data_frame, black_sabbath_data_frame], ignore_index=True)
     pink_floyd_data_frame.to_csv((path + "PinkFloyd.csv"))
     black_sabbath_data_frame.to_csv((path + "BlackSabbath.csv"))
     pink_sabbath_data_frame.to_csv((path + "PinkSabbath.csv"))
+    paktofonika = do_threading(file.readline()[0:-1], [], 0.0, proxies_list)
+    figofagot = do_threading(file.readline(), [], 0.0, proxies_list)
+    braciofonika_pigo_pagot = pd.concat([paktofonika, figofagot], ignore_index=True)
+    paktofonika.to_csv((path + "Paktofonika.csv"))
+    figofagot.to_csv((path + "Bracia Figo Fagot.csv"))
+    braciofonika_pigo_pagot.to_csv((path + "Braciofonika Pigo Pagot.csv"))
     os.remove("valid_proxy_list")

@@ -1,7 +1,7 @@
 import os
 import random
 from scrapper import scrap_data
-from scrapper import clean_data
+from markov_model import clean_data
 from markov_model import create_markov_model
 from markov_model import generate_lyrics
 
@@ -16,63 +16,44 @@ pink_floyd_selected_albums = ["The Piper At The Gates Of Dawn", "A Saucerful Of 
                               "A Momentary Lapse Of Reason", "The Division Bell"]
 
 time_stamp = 3.5
+path = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(path, "Data")
+
+
+def generate_song(name):
+    dataset = clean_data(os.path.join(path, name))
+    n_gram = int(input("Select number of words in Markov state: "))
+    number_of_verses = int(input("Select number of verses: "))
+    words_in_verses = int(int(input("Select number of words in verses: ")) / n_gram)
+    model = create_markov_model(dataset, n_gram)
+    print('\n')
+    for i in range(number_of_verses):
+        generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), words_in_verses)
+        print(generated_lyrics)
 
 
 def main():
     print("Select data set to use in generation or other option:\n1. Pink Floyd lyrics generation\n2. Black Sabbath "
           "lyrics generation\n3. Bracia Figo Fagot\n4. Paktofonika\n5. Fused English (aka Pink Sabbath) lyrics "
-          "generation\n6. Fused Polish (aka Braciofonika Pigo Pagot)\n7. Prepare data\n8. Scrap data\n9. Exit")
-    pink_floyd_dataset = None
-    black_sabbath_dataset = None
-    pink_sabbath_dataset = None
-    paktofonika_dataset = None
-    bracia_figo_fagot_dataset = None
-    braciofonika_pigo_pagot_dataset = None
+          "generation\n6. Fused Polish (aka Braciofonika Pigo Pagot)\n7. Scrap data\n8. Exit")
     while True:
         selection = int(input())
         match selection:
             case 1:
-                model = create_markov_model(pink_floyd_dataset)
-                for i in range(5):
-                    generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), 10)
-                    print(generated_lyrics)
+                generate_song("Pink Floyd.csv")
             case 2:
-                model = create_markov_model(black_sabbath_dataset)
-                for i in range(5):
-                    generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), 10)
-                    print(generated_lyrics)
+                generate_song("Black Sabbath.csv")
             case 3:
-                model = create_markov_model(bracia_figo_fagot_dataset)
-                for i in range(5):
-                    generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), 10)
-                    print(generated_lyrics)
+                generate_song("Bracia Figo Fagot.csv")
             case 4:
-                model = create_markov_model(paktofonika_dataset)
-                for i in range(5):
-                    generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), 10)
-                    print(generated_lyrics)
+                generate_song("Paktofonika.csv")
             case 5:
-                model = create_markov_model(pink_sabbath_dataset)
-                for i in range(5):
-                    generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), 10)
-                    print(generated_lyrics)
+                generate_song("Pink Sabbath.csv")
             case 6:
-                model = create_markov_model(braciofonika_pigo_pagot_dataset)
-                for i in range(5):
-                    generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), 10)
-                    print(generated_lyrics)
+                generate_song("Braciofonika Pigo Pagot.csv")
             case 7:
-                path = os.path.dirname(os.path.abspath(__file__))
-                path = path + "\\Data\\"
-                pink_floyd_dataset = clean_data((path + "Pink Floyd.csv"))
-                black_sabbath_dataset = clean_data((path + "Black Sabbath.csv"))
-                pink_sabbath_dataset = clean_data((path + "Pink Sabbath.csv"))
-                paktofonika_dataset = clean_data((path + "Paktofonika.csv"))
-                bracia_figo_fagot_dataset = clean_data((path + "Bracia Figo Fagot.csv"))
-                braciofonika_pigo_pagot_dataset = clean_data((path + "Braciofonika Pigo Pagot.csv"))
-            case 8:
                 scrap_data(pink_floyd_selected_albums, black_sabbath_selected_albums, time_stamp)
-            case 9:
+            case 8:
                 break
         print("\nCommand executed")
 
