@@ -26,13 +26,15 @@ def generate_song(name):
     n_gram = int(input("Select number of words in Markov state: "))
     number_of_verses = int(input("Select number of verses: "))
     words_in_verses = int((int(input("Select number of words in verses: ")) - 1) / n_gram)
-    degree_of_chain = int(input("Select degree of chain: "))
-    model = create_markov_model(dataset, n_gram, degree_of_chain)
+    # degree_of_chain = int(input("Select degree of chain: "))
+    model = create_markov_model(dataset, n_gram)
     print('\n')
     last_state = random.choice(list(model.keys()))
+    rime = None
     for i in range(number_of_verses):
-        generated_lyrics, last_state = generate_lyrics(model, last_state, words_in_verses)
+        generated_lyrics, last_state = generate_lyrics(model, last_state, words_in_verses, True if i == 0 else False, rime)
         print(generated_lyrics)
+        rime = last_state
         last_state = random.choices(list(model[last_state].keys()),
                                     list(model[last_state].values()))[0]
 

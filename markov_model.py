@@ -1,5 +1,6 @@
 import random
 import re
+from nltk import SyllableTokenizer
 from nltk.tokenize import word_tokenize
 import pandas as pd
 import numpy as np
@@ -29,7 +30,7 @@ def clean_data(name):
     return dataset
 
 
-def create_markov_model(dataset, n_gram, n_step):
+def create_markov_model(dataset, n_gram):
     markov_model = {}
     for i in range(len(dataset) - 1 - 2 * n_gram):
         current_state, next_state = "", ""
@@ -73,16 +74,35 @@ def create_markov_model(dataset, n_gram, n_step):
     return markov_model
 
 
-def generate_lyrics(markov_model, start, limit):
+def generate_lyrics(markov_model, start, limit, isStartingVerse, rime):
     n = 0
     current_state = start
     lyrics = ""
     lyrics += current_state + " "
     lyrics = lyrics[0].upper() + lyrics[1:]
     while n < limit:
-        next_state = random.choices(list(markov_model[current_state].keys()),
-                                    list(markov_model[current_state].values()))
-        current_state = next_state[0]
+        if n == limit - 1 and not isStartingVerse:
+            rime = rime.split(" ")[-1]
+            tk = SyllableTokenizer()
+            rime_syllab = tk.tokenize(rime)[-1]
+            rime_states = {}
+            for state, probability in markov_model[current_state].items():
+                word = state.split(" ")[-1]
+                syllab = tk.tokenize(word)[-1]
+                if rime_syllab == syllab and rime != word:
+                    rime_states.update({state: probability})
+            if rime_states:
+                next_state = random.choices(list(rime_states.keys()),
+                                            list(rime_states.values()))
+                current_state = next_state[0]
+            else:
+                next_state = random.choices(list(markov_model[current_state].keys()),
+                                            list(markov_model[current_state].values()))
+                current_state = next_state[0]
+        else:
+            next_state = random.choices(list(markov_model[current_state].keys()),
+                                        list(markov_model[current_state].values()))
+            current_state = next_state[0]
         lyrics += current_state + " "
         n += 1
     return lyrics, current_state
