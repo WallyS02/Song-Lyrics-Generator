@@ -6,7 +6,6 @@ import os
 import time
 from ScrapThread import ScrapThread
 from proxy_handling import proxies_validation
-from main import path
 
 
 def connect(url, proxies_list):
@@ -16,8 +15,8 @@ def connect(url, proxies_list):
     main_page = None
     while True:
         try:
-            main_page = requests.get(url, headers=headers, proxies={'http': random.choice(proxies_list),
-                                                                    'https': random.choice(proxies_list)}, timeout=5.0)
+            main_page = requests.get(url, headers=headers) #, proxies={'http': random.choice(proxies_list),
+                                                           #         'https': random.choice(proxies_list)}, timeout=5.0)
             break
         except:
             continue
@@ -138,12 +137,17 @@ def do_threading(url, selected_albums, time_stamp, proxies_list):
 
 
 def scrap_data(url, selected_albums, time_stamp):
-    proxies_list = proxies_validation()
+    # proxies_list = proxies_validation()
+    proxies_list = []
     df = do_threading(url, selected_albums, time_stamp, proxies_list)
+    path = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(path, "Data")
     if url.split('/')[2] == 'www.azlyrics.com':
-        filename = url.split('/')[4][:-5]
-        df.to_csv((path + filename))
+        filename = url.split('/')[4][:-5] + '.csv'
+        saving = os.path.join(path, filename)
+        df.to_csv(saving)
     if url.split('/')[2] == 'www.tekstowo.pl':
-        filename = url.split(',')[1][:-5]
-        df.to_csv((path + filename))
-    os.remove("valid_proxy_list")
+        filename = url.split(',')[1][:-5] + '.csv'
+        saving = os.path.join(path, filename)
+        df.to_csv(saving)
+    # os.remove("valid_proxy_list")

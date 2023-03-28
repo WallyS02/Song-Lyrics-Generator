@@ -1,22 +1,20 @@
 import os
 import random
-
 import pandas as pd
-
 from scrapper import scrap_data
 from markov_model import clean_data
 from markov_model import create_markov_model
 from markov_model import generate_lyrics
 
 blacksabbath_selected_albums = ["Black Sabbath", "Paranoid", "Master Of Reality", "Vol 4", "Sabbath Bloody Sabbath",
-                                 "Sabotage", "Technical Ecstasy", "Never Say Die!", "Heaven And Hell", "Mob Rules",
-                                 "Born Again", "Seventh Star", "The Eternal Idol", "Headless Cross", "Tyr",
-                                 "Dehumanizer", "Cross Purposes", "Forbidden", "13"]
+                                "Sabotage", "Technical Ecstasy", "Never Say Die!", "Heaven And Hell", "Mob Rules",
+                                "Born Again", "Seventh Star", "The Eternal Idol", "Headless Cross", "Tyr",
+                                "Dehumanizer", "Cross Purposes", "Forbidden", "13"]
 
 pinkfloyd_selected_albums = ["The Piper At The Gates Of Dawn", "A Saucerful Of Secrets", "Meddle", "More", "Ummagumma",
-                              "Atom Heart Mother", "Obscured By Clouds", "The Dark Side Of The Moon",
-                              "Wish You Were Here", "Animals", "The Wall", "The Final Cut",
-                              "A Momentary Lapse Of Reason", "The Division Bell"]
+                             "Atom Heart Mother", "Obscured By Clouds", "The Dark Side Of The Moon",
+                             "Wish You Were Here", "Animals", "The Wall", "The Final Cut",
+                             "A Momentary Lapse Of Reason", "The Division Bell"]
 
 time_stamp = 3.5
 path = os.path.dirname(os.path.abspath(__file__))
@@ -65,20 +63,20 @@ def scraping():
 
 def merging():
     name1 = input("Select first band file: ")
-    if os.path.exists(path + name1):
-        df1 = pd.read_csv(path + name1)
+    if os.path.exists(os.path.join(path, name1)):
+        df1 = pd.read_csv(os.path.join(path, name1))
     else:
         print("No such file in directory!")
         return
     name2 = input("Select second band file: ")
-    if os.path.exists(path + name2):
-        df2 = pd.read_csv(path + name2)
+    if os.path.exists(os.path.join(path, name2)):
+        df2 = pd.read_csv(os.path.join(path, name2))
     else:
         print("No such file in directory!")
         return
     dfResult = pd.concat([df1, df2], ignore_index=True)
     result_name = input("Select name of result file: ")
-    dfResult.to_csv(path + result_name)
+    dfResult.to_csv(os.path.join(path, result_name))
 
 
 def main():
