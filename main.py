@@ -1,16 +1,19 @@
 import os
 import random
+
+import pandas as pd
+
 from scrapper import scrap_data
 from markov_model import clean_data
 from markov_model import create_markov_model
 from markov_model import generate_lyrics
 
-black_sabbath_selected_albums = ["Black Sabbath", "Paranoid", "Master Of Reality", "Vol 4", "Sabbath Bloody Sabbath",
+blacksabbath_selected_albums = ["Black Sabbath", "Paranoid", "Master Of Reality", "Vol 4", "Sabbath Bloody Sabbath",
                                  "Sabotage", "Technical Ecstasy", "Never Say Die!", "Heaven And Hell", "Mob Rules",
                                  "Born Again", "Seventh Star", "The Eternal Idol", "Headless Cross", "Tyr",
                                  "Dehumanizer", "Cross Purposes", "Forbidden", "13"]
 
-pink_floyd_selected_albums = ["The Piper At The Gates Of Dawn", "A Saucerful Of Secrets", "Meddle", "More", "Ummagumma",
+pinkfloyd_selected_albums = ["The Piper At The Gates Of Dawn", "A Saucerful Of Secrets", "Meddle", "More", "Ummagumma",
                               "Atom Heart Mother", "Obscured By Clouds", "The Dark Side Of The Moon",
                               "Wish You Were Here", "Animals", "The Wall", "The Final Cut",
                               "A Momentary Lapse Of Reason", "The Division Bell"]
@@ -24,36 +27,74 @@ def generate_song(name):
     dataset = clean_data(os.path.join(path, name))
     n_gram = int(input("Select number of words in Markov state: "))
     number_of_verses = int(input("Select number of verses: "))
-    words_in_verses = int(int(input("Select number of words in verses: ")) / n_gram)
-    model = create_markov_model(dataset, n_gram)
+    words_in_verses = int((int(input("Select number of words in verses: ")) - 1) / n_gram)
+    degree_of_chain = int(input("Select degree of chain: "))
+    model = create_markov_model(dataset, n_gram, degree_of_chain)
     print('\n')
+    last_state = random.choice(list(model.keys()))
     for i in range(number_of_verses):
-        generated_lyrics = generate_lyrics(model, random.choice(list(model.keys())), words_in_verses)
+        generated_lyrics, last_state = generate_lyrics(model, last_state, words_in_verses)
         print(generated_lyrics)
+        last_state = random.choices(list(model[last_state].keys()),
+                                    list(model[last_state].values()))[0]
+
+
+def scraping():
+    with open("links.txt", "r") as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if i != (len(lines) - 1):
+                print(str(i) + ".", lines[i][:-1])
+            else:
+                print(str(i) + ".", lines[i])
+    line_index = int(input("Select url to scrap: "))
+    url = lines[line_index]
+    if line_index != (len(lines) - 1):
+        url = url[:-1]
+    if url.split('/')[2] == 'www.azlyrics.com':
+        selected_albums_name = url.split('/')[4][:-5] + "_selected_albums"
+        if selected_albums_name in globals():
+            selected_albums = globals()[selected_albums_name]
+            scrap_data(url, selected_albums, time_stamp)
+        else:
+            print("Define selected albums in global list variable in format: bandname_selected_albums")
+            return
+    if url.split('/')[2] == 'www.tekstowo.pl':
+        scrap_data(url, [], 0.0)
+
+
+def merging():
+    name1 = input("Select first band file: ")
+    if os.path.exists(path + name1):
+        df1 = pd.read_csv(path + name1)
+    else:
+        print("No such file in directory!")
+        return
+    name2 = input("Select second band file: ")
+    if os.path.exists(path + name2):
+        df2 = pd.read_csv(path + name2)
+    else:
+        print("No such file in directory!")
+        return
+    dfResult = pd.concat([df1, df2], ignore_index=True)
+    result_name = input("Select name of result file: ")
+    dfResult.to_csv(path + result_name)
 
 
 def main():
-    print("Select data set to use in generation or other option:\n1. Pink Floyd lyrics generation\n2. Black Sabbath "
-          "lyrics generation\n3. Bracia Figo Fagot\n4. Paktofonika\n5. Fused English (aka Pink Sabbath) lyrics "
-          "generation\n6. Fused Polish (aka Braciofonika Pigo Pagot)\n7. Scrap data\n8. Exit")
+    print("Select data set to use in generation or other option:\n1. Generate text based on input filename\n2. Scrap "
+          "data\n3. Merge CSV band's songs\n4. Exit")
     while True:
         selection = int(input())
         match selection:
             case 1:
-                generate_song("Pink Floyd.csv")
+                name = input("Select name of data file: ")
+                generate_song(name)
             case 2:
-                generate_song("Black Sabbath.csv")
+                scraping()
             case 3:
-                generate_song("Bracia Figo Fagot.csv")
+                merging()
             case 4:
-                generate_song("Paktofonika.csv")
-            case 5:
-                generate_song("Pink Sabbath.csv")
-            case 6:
-                generate_song("Braciofonika Pigo Pagot.csv")
-            case 7:
-                scrap_data(pink_floyd_selected_albums, black_sabbath_selected_albums, time_stamp)
-            case 8:
                 break
         print("\nCommand executed")
 

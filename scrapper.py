@@ -6,6 +6,7 @@ import os
 import time
 from ScrapThread import ScrapThread
 from proxy_handling import proxies_validation
+from main import path
 
 
 def connect(url, proxies_list):
@@ -136,21 +137,13 @@ def do_threading(url, selected_albums, time_stamp, proxies_list):
     return df
 
 
-def scrap_data(pink_floyd_selected_albums, black_sabbath_selected_albums, time_stamp):
+def scrap_data(url, selected_albums, time_stamp):
     proxies_list = proxies_validation()
-    file = open("links.txt")
-    path = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(path, "Data")
-    pink_floyd_data_frame = do_threading(file.readline()[0:-1], pink_floyd_selected_albums, time_stamp, proxies_list)
-    black_sabbath_data_frame = do_threading(file.readline(), black_sabbath_selected_albums, time_stamp, proxies_list)
-    pink_sabbath_data_frame = pd.concat([pink_floyd_data_frame, black_sabbath_data_frame], ignore_index=True)
-    pink_floyd_data_frame.to_csv((path + "PinkFloyd.csv"))
-    black_sabbath_data_frame.to_csv((path + "BlackSabbath.csv"))
-    pink_sabbath_data_frame.to_csv((path + "PinkSabbath.csv"))
-    paktofonika = do_threading(file.readline()[0:-1], [], 0.0, proxies_list)
-    figofagot = do_threading(file.readline(), [], 0.0, proxies_list)
-    braciofonika_pigo_pagot = pd.concat([paktofonika, figofagot], ignore_index=True)
-    paktofonika.to_csv((path + "Paktofonika.csv"))
-    figofagot.to_csv((path + "Bracia Figo Fagot.csv"))
-    braciofonika_pigo_pagot.to_csv((path + "Braciofonika Pigo Pagot.csv"))
+    df = do_threading(url, selected_albums, time_stamp, proxies_list)
+    if url.split('/')[2] == 'www.azlyrics.com':
+        filename = url.split('/')[4][:-5]
+        df.to_csv((path + filename))
+    if url.split('/')[2] == 'www.tekstowo.pl':
+        filename = url.split(',')[1][:-5]
+        df.to_csv((path + filename))
     os.remove("valid_proxy_list")

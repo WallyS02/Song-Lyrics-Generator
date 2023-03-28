@@ -2,6 +2,8 @@ import random
 import re
 from nltk.tokenize import word_tokenize
 import pandas as pd
+import numpy as np
+from scipy import sparse
 
 
 def clean_data(name):
@@ -27,9 +29,9 @@ def clean_data(name):
     return dataset
 
 
-def create_markov_model(dataset, n_gram):
+def create_markov_model(dataset, n_gram, n_step):
     markov_model = {}
-    for i in range(len(dataset) - n_gram - 1):
+    for i in range(len(dataset) - 1 - 2 * n_gram):
         current_state, next_state = "", ""
         for j in range(n_gram):
             current_state += dataset[i + j] + " "
@@ -48,6 +50,26 @@ def create_markov_model(dataset, n_gram):
         total = sum(transition.values())
         for state, count in transition.items():
             markov_model[current_state][state] = count / total
+    """matrix = [[0 for _ in range(len(markov_model.items()))] for _ in range(int(len(markov_model.items())))]
+    for current_state, transition in markov_model.items():
+        tempRow = list(markov_model.items())
+        indexRow = [idx for idx, key in enumerate(tempRow) if key[0] == current_state]
+        total = sum(transition.values())
+        for state, count in transition.items():
+            tempCol = list(transition.items())
+            indexCol = [idx for idx, key in enumerate(tempCol) if key[0] == state]
+            markov_model[current_state][state] = count / total
+            matrix[indexRow[0]][indexCol[0]] = markov_model[current_state][state]
+    matrix = np.array(matrix)
+    for i in range(n_step):
+        matrix = matrix.dot(matrix)
+        for current_state, transition in markov_model.items():
+            tempRow = list(markov_model.items())
+            indexRow = [idx for idx, key in enumerate(tempRow) if key[0] == current_state]
+            for state, count in transition.items():
+                tempCol = list(transition.items())
+                indexCol = [idx for idx, key in enumerate(tempCol) if key[0] == state]
+                markov_model[current_state][state] += matrix[indexRow[0]][indexCol[0]]"""
     return markov_model
 
 
@@ -63,4 +85,4 @@ def generate_lyrics(markov_model, start, limit):
         current_state = next_state[0]
         lyrics += current_state + " "
         n += 1
-    return lyrics
+    return lyrics, current_state
