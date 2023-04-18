@@ -5,6 +5,7 @@ from scrapper import scrap_data
 from markov_model import clean_data
 from markov_model import create_markov_model
 from markov_model import generate_lyrics
+import json
 
 blacksabbath_selected_albums = ["Black Sabbath", "Paranoid", "Master Of Reality", "Vol 4", "Sabbath Bloody Sabbath",
                                 "Sabotage", "Technical Ecstasy", "Never Say Die!", "Heaven And Hell", "Mob Rules",
@@ -18,15 +19,42 @@ pinkfloyd_selected_albums = ["The Piper At The Gates Of Dawn", "A Saucerful Of S
 
 time_stamp = 3.5
 path = os.path.dirname(os.path.abspath(__file__))
-path = os.path.join(path, "Data")
+pathData = os.path.join(path, "Data")
+pathModels = os.path.join(path, "Models")
 
 
-def generate_song(name):
-    dataset = clean_data(os.path.join(path, name))
+def create_model():
+    filelist = []
+    for file in os.listdir(pathData):
+        if os.path.isfile(os.path.join(pathData, file)):
+            filelist.append(file)
+    i = 0
+    for file in filelist:
+        print(i, ": ", file)
+        i += 1
+    name = filelist[int(input("Select datafile: "))]
+    dataset = clean_data(os.path.join(pathData, name))
     n_gram = int(input("Select number of words in Markov state: "))
-    number_of_verses = int(input("Select number of verses: "))
-    words_in_verses = int(input("Select number of words in verses: ")) - n_gram
     model = create_markov_model(dataset, n_gram)
+    model_name = input("Select model name: ")
+    with open(os.path.join(pathModels, model_name) + '.json', 'w') as model_file:
+        model_file.write(json.dumps(model))
+
+
+def generate_song():
+    filelist = []
+    for file in os.listdir(pathModels):
+        if os.path.isfile(os.path.join(pathModels, file)):
+            filelist.append(file)
+    i = 0
+    for file in filelist:
+        print(i, ": ", file)
+        i += 1
+    model_name = filelist[int(input("Select model: "))]
+    with open(os.path.join(pathModels, model_name), 'r') as model_file:
+        model = json.loads(model_file.read())
+    number_of_verses = int(input("Select number of verses: "))
+    words_in_verses = int(input("Select number of words in verses: ")) - len(list(model.keys())[0].split(' '))
     print('\n')
     rime = None
     for i in range(number_of_verses):
@@ -59,37 +87,46 @@ def scraping():
 
 
 def merging():
-    name1 = input("Select first band file: ")
-    if os.path.exists(os.path.join(path, name1)):
-        df1 = pd.read_csv(os.path.join(path, name1))
-    else:
-        print("No such file in directory!")
-        return
-    name2 = input("Select second band file: ")
-    if os.path.exists(os.path.join(path, name2)):
-        df2 = pd.read_csv(os.path.join(path, name2))
-    else:
-        print("No such file in directory!")
-        return
-    dfResult = pd.concat([df1, df2], ignore_index=True)
+    df = pd.DataFrame(columns=['Title', 'Lyrics'])
+    print("Select files to merge: ")
+    filelist = []
+    for file in os.listdir(pathData):
+        if os.path.isfile(os.path.join(pathData, file)):
+            filelist.append(file)
+    while True:
+        i = 0
+        for file in filelist:
+            print(i, ": ", file)
+            i += 1
+        print(i, ": That's all")
+        option = int(input("Select option: "))
+        if option == i:
+            break
+        else:
+            df1 = pd.read_csv(os.path.join(pathData, filelist[option]))
+            df = pd.concat([df, df1], ignore_index=True)
+            filelist.pop(option)
     result_name = input("Select name of result file: ")
-    dfResult.to_csv(os.path.join(path, result_name))
+    df.to_csv(os.path.join(pathData, result_name))
 
 
 def main():
-    print("Select data set to use in generation or other option:\n1. Generate text based on input filename\n2. Scrap "
-          "data\n3. Merge CSV band's songs\n4. Exit")
+    print("Select option:\n1. Create model based on datafile\n2. Generate lyrics with model.\n3. Scrap "
+          "data\n4. Merge CSV band's songs\n5. Exit")
     while True:
         selection = int(input())
         match selection:
             case 1:
-                name = input("Select name of data file: ")
-                generate_song(name)
+                create_model()
+                pass
             case 2:
-                scraping()
+                generate_song()
+                pass
             case 3:
-                merging()
+                scraping()
             case 4:
+                merging()
+            case 5:
                 break
         print("\nCommand executed")
 
