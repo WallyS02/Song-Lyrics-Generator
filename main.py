@@ -2,9 +2,7 @@ import os
 import random
 import pandas as pd
 from scrapper import scrap_data
-from markov_model import clean_data
-from markov_model import create_markov_model
-from markov_model import generate_lyrics
+from markov_model import clean_data, create_markov_model, generate_lyrics, self_BLEU, zipfs_law, plot_heaps_laws
 import json
 
 blacksabbath_selected_albums = ["Black Sabbath", "Paranoid", "Master Of Reality", "Vol 4", "Sabbath Bloody Sabbath",
@@ -23,15 +21,20 @@ pathData = os.path.join(path, "Data")
 pathModels = os.path.join(path, "Models")
 
 
-def create_model():
+def print_file_list(filepath):
     filelist = []
-    for file in os.listdir(pathData):
-        if os.path.isfile(os.path.join(pathData, file)):
+    for file in os.listdir(filepath):
+        if os.path.isfile(os.path.join(filepath, file)):
             filelist.append(file)
     i = 0
     for file in filelist:
         print(i, ": ", file)
         i += 1
+    return filelist
+
+
+def create_model():
+    filelist = print_file_list(pathData)
     name = filelist[int(input("Select datafile: "))]
     dataset = clean_data(os.path.join(pathData, name))
     n_gram = int(input("Select number of words in Markov state: "))
@@ -42,14 +45,7 @@ def create_model():
 
 
 def generate_song():
-    filelist = []
-    for file in os.listdir(pathModels):
-        if os.path.isfile(os.path.join(pathModels, file)):
-            filelist.append(file)
-    i = 0
-    for file in filelist:
-        print(i, ": ", file)
-        i += 1
+    filelist = print_file_list(pathModels)
     model_name = filelist[int(input("Select model: "))]
     with open(os.path.join(pathModels, model_name), 'r') as model_file:
         model = json.loads(model_file.read())
@@ -57,9 +53,13 @@ def generate_song():
     words_in_verses = int(input("Select number of words in verses: ")) - len(list(model.keys())[0].split(' '))
     print('\n')
     rime = None
+    song = []
     for i in range(number_of_verses):
         generated_lyrics, rime = generate_lyrics(model, random.choice(list(model.keys())), words_in_verses, True if i % 2 == 1 else False, rime)
         print(generated_lyrics)
+        for state in generated_lyrics.split():
+            song.append(state.lower())
+    return song
 
 
 def scraping():
@@ -111,7 +111,7 @@ def merging():
 
 
 def main():
-    print("Select option:\n1. Create model based on datafile\n2. Generate lyrics with model.\n3. Scrap "
+    print("Select option:\n1. Create model based on datafile\n2. Generate lyrics with model\n3. Scrap "
           "data\n4. Merge CSV band's songs\n5. Exit")
     while True:
         selection = int(input())

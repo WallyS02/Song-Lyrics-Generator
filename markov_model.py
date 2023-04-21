@@ -1,8 +1,13 @@
+import copy
+import math
 import random
 import re
 from nltk import SyllableTokenizer
 from nltk.tokenize import word_tokenize
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def clean_data(name):
@@ -100,3 +105,78 @@ def generate_lyrics(markov_model, start, limit, try_rhyme, rime):
             current_state, lyrics = default_next_state(markov_model, current_state, lyrics)
         n += 1
     return lyrics, current_state
+
+
+def get_bleu(verse, remaining_verses):
+    bleues = []
+    smoothie = SmoothingFunction()
+    for other_verse in remaining_verses:
+        bleu = sentence_bleu(verse, other_verse, smoothing_function=smoothie.method1)
+        bleues.append(bleu)
+    return bleues
+
+
+def self_BLEU(verses):
+    bleu_scores = []
+    for verse in verses:
+        remaining_verses = copy.deepcopy(verses)
+        remaining_verses.remove(verse)
+        bleu = get_bleu(verse, remaining_verses)
+        bleu_scores.append(bleu)
+    return np.mean(bleu_scores)
+
+
+def zipfs_law(dataset, name, firstValues=1000):
+    histogram = {}
+    for state in dataset:
+        if state in histogram.keys():
+            histogram[state] += 1
+        else:
+            histogram[state] = 1
+    keys = list(histogram.keys())
+    values = list(histogram.values())
+    sorted_value_index = np.argsort(-np.array(values))
+    sorted_histogram = {keys[i]: values[i] for i in sorted_value_index}
+    plt.bar([i for i in range(min(len(sorted_histogram), firstValues))],
+            [list(sorted_histogram.values())[i] for i in range(min(len(sorted_histogram), firstValues))])
+    plt.xlabel("states")
+    plt.ylabel("occurrences")
+    plt.title(name + " state histogram")
+    plt.tight_layout()
+    plt.show()
+    constant_list = []
+    for i, state in enumerate(sorted_histogram.values()):
+        if i == min(len(sorted_histogram), firstValues):
+            break
+        constant_list.append((i + 1) * state)
+    plt.xlabel("states")
+    plt.ylabel("constants")
+    plt.title(name + " state constants plot")
+    plt.tight_layout()
+    plt.bar([i for i in range(min(len(sorted_histogram), firstValues))], constant_list)
+    plt.show()
+
+
+def heaps_law(dataset, n_gram):
+    unique_states = []
+    for state in dataset:
+        if state not in unique_states:
+            unique_states.append(state)
+    return int(math.factorial(len(unique_states)) / math.factorial(len(unique_states) - n_gram)), len(dataset) ** n_gram
+
+
+def plot_heaps_laws(datasets, n_grams):
+    plt.xlabel("total number of states")
+    plt.ylabel("unique number of states")
+    plt.title("Heap's law")
+    for n_gram in n_grams:
+        x = []
+        y = []
+        for dataset in datasets:
+            unique, total = heaps_law(dataset, n_gram)
+            x.append(total)
+            y.append(unique)
+        plt.plot(x, y, linewidth=1.0)
+        plt.legend(["n_gram: " + str(n_gram)])
+        plt.tight_layout()
+        plt.show()

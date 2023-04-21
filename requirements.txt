@@ -1,4 +1,7 @@
 nltk
 pandas
-bs4
 requests
+beautifulsoup4
+numpy
+bs4
+matplotlib
