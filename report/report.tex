@@ -6,6 +6,9 @@
 \graphicspath{{images/}}
 \usepackage{blindtext}
 \usepackage{hyperref}
+\usepackage{placeins}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \title{Generacja tekstów piosenek}
 \author{Maciej Krzyżanowski, Sebastian Kutny, Tomasz Lewandowski}
@@ -39,6 +42,7 @@ Przed rozpoczęciem przetwarzania danych są one oczyszczane poprzez ujednolceni
 Tekst jest generowany jako dowolna liczba wersów o dowolnej ilości słow.
 \newpage
 \section{Łańcuchy Markova}
+\subsection{Wstęp}
 Łańcuchy Markova to matematyczny model służący do generowania tekstu lub sekwencji innych elementów, takich jak dźwięki lub obrazy. Ideą modelu jest analiza sekwencji istniejących elementów i wykorzystanie tych informacji do przewidywania, jakie elementy powinny pojawić się następnie. \\
 \\
 W przypadku generowania tekstu, łańcuchy Markova są zwykle stosowane do analizy sekwencji słów w tekście źródłowym i generowania nowych sekwencji słów na podstawie tych informacji. Proces zaczyna się od wyboru deterministycznego lub losowego początkowego stanu łańcucha, a następnie generowania kolejnych stanów na podstawie informacji o pradwopodobieństwie wystąpienia po sobie stanów w analizowanym tekście w kontekście poprzednio wygenerowanych stanów. Przykładowo, jeśli w tekście źródłowym po słowie "generator" często pojawia się słowo "piosenek", to model łańcucha Markova przypisze wysokie prawdopodobieństwo wystąpienia słowa "piosenek" po słowie "generator". \\
@@ -51,11 +55,137 @@ Model łańcuchów Markova nie jest idealny i może generować sekwencje, które
 \\
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\textwidth]{plot}
-    \caption{Przykład łańcucha Markova, gdzie stany mogą oznaczać słowa lub sekwencje słów, a przejścia pomiędzy nimi określono jako prawdpopodobieństwa $p$}
+    \includegraphics[width=0.75\textwidth]{chain}
+    \caption{Przykład łańcucha Markova, dla zdania "The quick brown fox jumps over the lazy dog and the angry dog chase the quick brown fox.", dla wartości $ngram = 1$, oznaczającej stany jako pojedyncze słowama oraz wartoścami prawdopodobieństw przejść pomiędzy stanami obliczonych na podstawie zdania wejściowego.}
     \label{fig:mesh1}
 \end{figure}
-
+\FloatBarrier
+\subsection{Prawo Zipfa}
+Prawo Zipfa to empiryczna obserwacja dotycząca częstotliwości występowania słów w korpusie tekstów. Mówi ono, że jeśli posortujemy słowa występujące w tekście według częstotliwości ich wystąpień i przyporządkujemy każdemu słowu rangę zgodną z jego pozycją w rankingu, to liczba wystąpień słowa o danej randze jest odwrotnie proporcjonalna do wartości tej rangi. W praktyce oznacza to, że najczęściej występujące słowo będzie występować dwa razy częściej niż drugie na liście, trzy razy częściej niż trzecie, i tak dalej. \\
+\\
+Wykorzystując Prawo Zipfa w generacji tekstów piosenek, można zapewnić, że wygenerowany tekst będzie przypominał rzeczywiste teksty pod względem częstotliwości występowania słów.
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{somemix_zipf1}
+         \caption{Wykres 1000 najczęściej pojawiających się słów dla zbioru danych $somemix.csv$.}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{somemix_zipf2}
+         \caption{Wykres stałej $constant = ranga * wystapienia$ dla zbioru danych $somemix.csv$}
+         \label{fig:mesh1}
+     \end{subfigure}
+\end{figure}
+\FloatBarrier
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{generated_zipf1}
+         \caption{Wykres 1000 najczęściej pojawiających się słów dla piosenki wygenerowanej na podstawie $somemix.csv$ o 100 wersach po 500 słów.}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{generated_zipf2}
+         \caption{Wykres stałej $constant = ranga * wystapienia$  dla piosenki wygenerowanej na podstawie $somemix.csv$ o 100 wersach po 500 słów}
+         \label{fig:mesh1}
+     \end{subfigure}
+\end{figure}
+\FloatBarrier
+Podobieństwo wykresów wskazuje na to, że tekst wyjściowy modelu będzie tej samej jakości, przypominając tekst dany na wejściu.
+\subsection{Prawo Heapsa}
+Prawo Heapsa opisuje zależność pomiędzy wielkością dokumentu w jednostce liter, słów, stanów złożonych ze słów w kontekście liczby unikalnych liter, słów, stanów złożonych ze słów pojawiających się w tekście. Na podstawie prawa, stwierdzamy, że liczba unikalnych stanów rośnie wolniej wraz ze zwiększającą się ilością stanów tekstu, co pozwala nam przewidzieć ilość unikalnych w zasobie danych, co pozwala na lepszą ocenę modelu Markova.
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{heaps1}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{heaps2}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{heaps3}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{heaps4}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{heaps5}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+        \caption{Wykres zależności liczby stanów unikalnych od rozmiaru tekstu oraz wartości $ngram$ dla zbiorów danych: $kyuss.csv, led\_zeppelin.csv, Black Sabbath.csv, ac\_dc.csv$.}
+        \label{fig:mesh1}
+\end{figure}
+\FloatBarrier
+Prawo Heapsa sprawdza się dla danych. Dodatkowo widzimy, że zmiana jest zależna od $ngramu$. Rośnie ona zwykle wolniej dla większych $ngramow$ co może oznaczać częste pojawianie się w tekstach określonych złożeń słów.
+\subsection{Entropia Krzyżowa}
+Entropia Krzyżowa to miara zgodności między dwoma rozkładami prawdopodobieństwa. Pozwala określić jak dobrze model generujący tekst przewiduje następny stan na podstawie poprzednich. W przypadku generowania tekstu, entropia krzyżowa może być wykorzystana do oceny jakości generacji. Im mniejsza wartość entropii krzyżowej, tym większa zgodność między rozkładem prawdopodobieństwa generowanego tekstu a rozkładem prawdopodobieństwa prawdziwych tekstów. Pozwala to ocenić czy model tworzy teksty podobne do tych ze zbioru danych, czy też tworzy nowe i oryginalne sentencje.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{cross-entropy}
+    \caption{Wykres wartości entropii krzyżowej dla tekstu generowanego na podstawie zbioru danych $somemix.csv$, zależnie od rozmiaru wygenerowanego tekstu.}
+    \label{fig:mesh1}
+\end{figure}
+\FloatBarrier
+Jak widać, entropia krzyżowa rośnie niemal liniowo względem długości wygenerowanego tekstu. Oznacza to, że model coraz to bardziej generuje tekst niepodobny do oryginalnego zależnie od długości wygenerowanego tekstu.
+\subsection{Perpleksja}
+Perpleksja to stopień trudności zrozumienia tekstu, miara nieprzewidywalności modelu. Im niższa tym tekst bardziej przypomina oryginalny i jest bardziej kreatywny. Aby policzyć wartość perpleksji tekstu korzystamy ze wzoru: $Perplexity(M) = 2^{H(L,M)}$ gdzie $M$ oznacza model, $L$ oznacza wygenerowany tekst, a $H(L, M)$ wartość entropii krzyżowej.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{perplexity}
+    \caption{Wykres wartości perpleksji dla tekstu generowanego na podstawie zbioru danych $somemix.csv$, zależnie od rozmiaru wygenerowanego tekstu.}
+    \label{fig:mesh1}
+\end{figure}
+\\Jak widać, wykresy eksperymentu dla entropii krzyżowej i perpleksji się nie różnią, ponieważ w gruncie rzeczy znaczą tą samą miarę.
+\subsection{Self-BLEU}
+Self-BLEU określa różnorodność generowanego tekstu. Wykorzystuje wskaźnik \href{https://pl.wikipedia.org/wiki/BLEU}{BLEU} (ang. BiLingual Evaluation Understudy), licząc jego wartość dla kombinacji par wszystkich unikalnych sentencji wygenerowanego tekstu, w tym przypadku wersów piosenki, otrzymując końcowo ich średnią. Im mniejsza wartość wskaźnika tym większa różnorodność w tekście. Metryka pozwala uniknąć monotonności tekstu.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{self-bleu}
+    \caption{Wykres wartości Self-BLEU dla tekstu generowanego na podstawie zbioru danych $somemix.csv$, zależnie od rozmiaru wygenerowanego tekstu.}
+    \label{fig:mesh1}
+\end{figure}
+\\Jak widać, tekst zachowuje wysoką różnorodność, poprzez losowy wybór początku wersu rozkładem równomiernym, a z coraz to większym rozmiarem tekstu napotykamy na podobne frazy, co zmniejsza jego różnorodność, jednak wciąż wynik jest zależny od wygenerowanych tekstów.
+\FloatBarrier
+\subsection{Przykładowe wyniki}
 \newpage
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{english_mixtape}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{somemix}
+         \label{fig:mesh1}
+     \end{subfigure}
+     \hfill
+        \caption{Przykładowe wyniki generacji 10 wersów po 10 słów, kolejno dla zbiorów danych: $english\_mixtape.csv$ oraz $somemix.csv$}
+        \label{fig:mesh1}
+\end{figure}
+\FloatBarrier
 \section{Rekurencyjne Sieci Neuronowe}
 \end{document}

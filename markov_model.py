@@ -4,7 +4,7 @@ import random
 import re
 from nltk import SyllableTokenizer
 from nltk.tokenize import word_tokenize
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -107,21 +107,21 @@ def generate_lyrics(markov_model, start, limit, try_rhyme, rime):
     return lyrics, current_state
 
 
-def get_bleu(verse, remaining_verses):
-    bleues = []
+def get_bleu(sentence, remaining_sentences):
+    lst = []
     smoothie = SmoothingFunction()
-    for other_verse in remaining_verses:
-        bleu = sentence_bleu(verse, other_verse, smoothing_function=smoothie.method1)
-        bleues.append(bleu)
-    return bleues
+    for i in remaining_sentences:
+        bleu = sentence_bleu(sentence, i, smoothing_function=smoothie.method1)
+        lst.append(bleu)
+    return lst
 
 
-def self_BLEU(verses):
+def self_BLEU(sentences):
     bleu_scores = []
-    for verse in verses:
-        remaining_verses = copy.deepcopy(verses)
-        remaining_verses.remove(verse)
-        bleu = get_bleu(verse, remaining_verses)
+    for i in sentences:
+        sentences_copy = copy.deepcopy(sentences)
+        sentences_copy.remove(i)
+        bleu = get_bleu(i, sentences_copy)
         bleu_scores.append(bleu)
     return np.mean(bleu_scores)
 
@@ -166,9 +166,6 @@ def heaps_law(dataset, n_gram):
 
 
 def plot_heaps_laws(datasets, n_grams):
-    plt.xlabel("total number of states")
-    plt.ylabel("unique number of states")
-    plt.title("Heap's law")
     for n_gram in n_grams:
         x = []
         y = []
@@ -177,6 +174,9 @@ def plot_heaps_laws(datasets, n_grams):
             x.append(total)
             y.append(unique)
         plt.plot(x, y, linewidth=1.0)
+        plt.xlabel("total number of states")
+        plt.ylabel("unique number of states")
+        plt.title("Heap's law")
         plt.legend(["n_gram: " + str(n_gram)])
         plt.tight_layout()
         plt.show()
