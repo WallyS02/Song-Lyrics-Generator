@@ -2,7 +2,7 @@ import os
 import random
 import pandas as pd
 from scrapper import scrap_data
-from markov_model import clean_data, create_markov_model, generate_lyrics, self_BLEU, zipfs_law, plot_heaps_laws
+from markov_model import clean_data, create_markov_model, generate_lyrics, self_BLEU, zipfs_law, plot_heaps_laws, cross_entropy, perplexity
 import json
 
 blacksabbath_selected_albums = ["Black Sabbath", "Paranoid", "Master Of Reality", "Vol 4", "Sabbath Bloody Sabbath",

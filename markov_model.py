@@ -36,7 +36,7 @@ def clean_data(name):
 
 def create_markov_model(dataset, n_gram):
     markov_model = {}
-    for i in range(len(dataset) - 1 - 2 * n_gram):
+    for i in range(len(dataset) - n_gram):
         current_state, next_state = "", ""
         for j in range(n_gram):
             current_state += dataset[i + j] + " "
@@ -180,3 +180,34 @@ def plot_heaps_laws(datasets, n_grams):
         plt.legend(["n_gram: " + str(n_gram)])
         plt.tight_layout()
         plt.show()
+
+
+def cross_entropy(model, text, k):
+    counts = {}
+    for i in range(len(text) - k):
+        gram = ""
+        for j in range(k):
+            gram += text[i + j] + " "
+        gram = gram[:-1]
+        if gram not in counts:
+            counts[gram] = 0
+        counts[gram] += 1
+
+    total = sum(counts.values())
+    probs = {gram: count / total for gram, count in counts.items()}
+
+    entropy = 0
+    for i in range(len(text) - k):
+        gram = ""
+        for j in range(k):
+            gram += text[i + j] + " "
+        gram = gram[:-1]
+        next_word = text[i + k]
+        if gram in model:
+            prob = model[gram].get(next_word, 0)
+            entropy -= np.log2(prob) * probs[gram]
+    return entropy
+
+
+def perplexity(entropy):
+    return pow(2, entropy)
