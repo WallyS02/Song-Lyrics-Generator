@@ -140,6 +140,12 @@ Prawo Heapsa opisuje zależność pomiędzy wielkością dokumentu w jednostce l
 Prawo Heapsa sprawdza się dla danych. Dodatkowo widzimy, że zmiana jest zależna od $ngramu$. Rośnie ona zwykle wolniej dla większych $ngramow$ co może oznaczać częste pojawianie się w tekstach określonych złożeń słów.
 \subsection{Entropia Krzyżowa}
 Entropia Krzyżowa to miara zgodności między dwoma rozkładami prawdopodobieństwa. Pozwala określić jak dobrze model generujący tekst przewiduje następny stan na podstawie poprzednich. W przypadku generowania tekstu, entropia krzyżowa może być wykorzystana do oceny jakości generacji. Im mniejsza wartość entropii krzyżowej, tym większa zgodność między rozkładem prawdopodobieństwa generowanego tekstu a rozkładem prawdopodobieństwa prawdziwych tekstów. Pozwala to ocenić czy model tworzy teksty podobne do tych ze zbioru danych, czy też tworzy nowe i oryginalne sentencje.
+\\\\
+Obliczanie Entropii krzyżowej:
+\begin{itemize}
+    \item Tworzymy rozkład prawdopodobieństwa wygenerowanego tekstu, zależnie od używanych n-gramów.
+    \item Iterując po każdym n-gramie tekstu wygenerowanego obliczamy sumę iloczynów logarytmu prawdopodobieństwa wystąpienia następnego słowa w modelu oraz prawdopodobieństwa wystąpienia następnego słowa w rozkładzie wygenerowanego tekstu. \\\\ $\sum log(P(M)) * P(L)$ \\ , gdzie $P(M)$ oznacza prawdopodobieństwa wystąpienia następnego słowa w modelu, a $P(L)$ prawdopodobieństwa wystąpienia następnego słowa w rozkładzie wygenerowanego tekstu.
+\end{itemize}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.75\textwidth]{cross-entropy}
@@ -156,36 +162,49 @@ Perpleksja to stopień trudności zrozumienia tekstu, miara nieprzewidywalności
     \caption{Wykres wartości perpleksji dla tekstu generowanego na podstawie zbioru danych $somemix.csv$, zależnie od rozmiaru wygenerowanego tekstu.}
     \label{fig:mesh1}
 \end{figure}
-\\Jak widać, wykresy eksperymentu dla entropii krzyżowej i perpleksji się nie różnią, ponieważ w gruncie rzeczy znaczą tą samą miarę.
+\FloatBarrier
+Jak widać, wykresy eksperymentu dla entropii krzyżowej i perpleksji się nie różnią, ponieważ w gruncie rzeczy znaczą tą samą miarę.
 \subsection{Self-BLEU}
-Self-BLEU określa różnorodność generowanego tekstu. Wykorzystuje wskaźnik \href{https://pl.wikipedia.org/wiki/BLEU}{BLEU} (ang. BiLingual Evaluation Understudy), licząc jego wartość dla kombinacji par wszystkich unikalnych sentencji wygenerowanego tekstu, w tym przypadku wersów piosenki, otrzymując końcowo ich średnią. Im mniejsza wartość wskaźnika tym większa różnorodność w tekście. Metryka pozwala uniknąć monotonności tekstu.
+Self-BLEU określa różnorodność generowanego tekstu. Wykorzystuje wskaźnik \href{https://pl.wikipedia.org/wiki/BLEU}{BLEU} (ang. BiLingual Evaluation Understudy), licząc jego wartość dla kombinacji par wszystkich unikalnych sentencji wygenerowanego tekstu, w tym przypadku wersów piosenki, otrzymując końcowo ich średnią. Im mniejsza wartość wskaźnika tym większa różnorodność w tekście. Metryka pozwala uniknąć monotonności tekstu. \\\\
+Sam wskaźnik BLEU mierzy podobieństwo między tłumaczeniem maszynowym a jednym lub wieloma tłumaczeniami referencyjnymi poprzez porównanie stopnia pokrycia n-gramów (ciągów po n kolejnych słów) między nimi. Im wyższy wynik, tym większe podobieństwo między tłumaczeniem a referencją. Wartości wskaźnika BLEU mieszczą się w przedziale od 0 do 1, gdzie 1 oznacza idealne dopasowanie tłumaczenia maszynowego do referencji. W praktyce, oczekuje się wyników BLEU powyżej 0,4-0,5, aby uznać tłumaczenie maszynowe za akceptowalne.\\
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.75\textwidth]{self-bleu}
     \caption{Wykres wartości Self-BLEU dla tekstu generowanego na podstawie zbioru danych $somemix.csv$, zależnie od rozmiaru wygenerowanego tekstu.}
     \label{fig:mesh1}
 \end{figure}
-\\Jak widać, tekst zachowuje wysoką różnorodność, poprzez losowy wybór początku wersu rozkładem równomiernym, a z coraz to większym rozmiarem tekstu napotykamy na podobne frazy, co zmniejsza jego różnorodność, jednak wciąż wynik jest zależny od wygenerowanych tekstów.
+\FloatBarrier
+Jak widać, tekst zachowuje wysoką różnorodność, poprzez losowy wybór początku wersu rozkładem równomiernym, a z coraz to większym rozmiarem tekstu napotykamy na nowe frazy, co zwiększa jego różnorodność, jednak wciąż wynik jest zależny od wygenerowanych tekstów.
 \FloatBarrier
 \subsection{Przykładowe wyniki}
 \newpage
-\begin{figure}
-     \centering
-     \begin{subfigure}[b]{0.75\textwidth}
-         \centering
-         \includegraphics[width=\textwidth]{english_mixtape}
-         \label{fig:mesh1}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.75\textwidth}
-         \centering
-         \includegraphics[width=\textwidth]{somemix}
-         \label{fig:mesh1}
-     \end{subfigure}
-     \hfill
-        \caption{Przykładowe wyniki generacji 10 wersów po 10 słów, kolejno dla zbiorów danych: $english\_mixtape.csv$ oraz $somemix.csv$}
-        \label{fig:mesh1}
-\end{figure}
-\FloatBarrier
+\begin{center}
+    Przykładowe wyniki generacji 10 wersów po 10 słów dla zbioru danych $english\_mixtape.csv$: \\
+    \leavevmode\\
+    \textsl{Shy yeah repeat everything i want you hard dont get \\
+            Slow with plenty of desperation in the night end of \\
+            Until that day lost my way you bat your eyes \\
+            Back baby cause your man is back wonder where you \\
+            Under water forever was their faith i will let you \\
+            Windows feel like giving up cause you know theres only \\
+            Lets shout lets make it baby now worry like lying \\
+            Some room for you and me can you heal what \\
+            Shot cmon terminator uzi makers regulators gon na blow my \\
+            A poto over the road youre on your move what} \\
+    \leavevmode\\\leavevmode\\
+    Przykładowe wyniki generacji 10 wersów po 10 słów dla zbioru danych $somemix.csv$: \\
+    \leavevmode\\
+    \textsl{Hell forget about me making a movie turn on a \\
+            Bas en haut jaimais manger sa peau je sais que \\
+            Main banu tera ehsaas main yaar banavanga akhiyaan milavanga akhiyaan \\
+            So stroke me and no reason to believe that parted \\
+            Now sexy dance sexy dancer hot as hades early eighties \\
+            How sophisticated you know what they do they laugh and \\
+            Of brotherly love the feel of silk and your talents \\
+            Goddamn alotta brilliant bitch have it you be not much \\
+            Line trill tell me youre always gon na need your \\
+            Crawling on them haters sick itd be worth more dan} \\
+    \leavevmode\\\leavevmode\\
+\end{center}
 \section{Rekurencyjne Sieci Neuronowe}
 \end{document}
