@@ -13,4 +13,4 @@ but it will be expanded to include even recursive neural networks version or the
 ## Authors
 - Sebastian Kutny
 - Tomasz Lewandowski
-- Maciej Kryżanowski
+- Maciej Krzyżanowski
