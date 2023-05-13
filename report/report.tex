@@ -144,7 +144,7 @@ Entropia Krzyżowa to miara zgodności między dwoma rozkładami prawdopodobień
 Obliczanie Entropii krzyżowej:
 \begin{itemize}
     \item Tworzymy rozkład prawdopodobieństwa wygenerowanego tekstu, zależnie od używanych n-gramów.
-    \item Iterując po każdym n-gramie tekstu wygenerowanego obliczamy sumę iloczynów logarytmu prawdopodobieństwa wystąpienia następnego słowa w modelu oraz prawdopodobieństwa wystąpienia następnego słowa w rozkładzie wygenerowanego tekstu. \\\\ $\sum log(P(M)) * P(L)$ \\ , gdzie $P(M)$ oznacza prawdopodobieństwa wystąpienia następnego słowa w modelu, a $P(L)$ prawdopodobieństwa wystąpienia następnego słowa w rozkładzie wygenerowanego tekstu.
+    \item Iterując po każdym n-gramie tekstu wygenerowanego obliczamy sumę iloczynów logarytmu prawdopodobieństwa wystąpienia następnego słowa w modelu oraz prawdopodobieństwa wystąpienia następnego słowa w rozkładzie wygenerowanego tekstu. \\\\ $-\sum log(P(M)) * P(L)$ \\ , gdzie $P(M)$ oznacza prawdopodobieństwa wystąpienia następnego słowa w modelu, a $P(L)$ prawdopodobieństwa wystąpienia następnego słowa w rozkładzie wygenerowanego tekstu.
 \end{itemize}
 \begin{figure}[h]
     \centering
