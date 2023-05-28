@@ -214,10 +214,31 @@ Podstawowym elementem rekurencyjnej sieci neuronowej jest rekurencyjna jednostka
 W trakcie uczenia rekurencyjnej sieci neuronowej wsteczna propagacja błędu jest stosowana w celu minimalizacji błędu wyjścia. Jednak w odróżnieniu od tradycyjnych sieci jednokierunkowych, RNN używają również propagacji wstecznej w czasie, aby rozprowadzić gradienty przez wszystkie kroki czasowe. Dzięki temu sieć jest w stanie uczyć się na podstawie kontekstu historycznego i uwzględniać informacje z poprzednich kroków.\\\\
 Rekurencyjne sieci neuronowe jednak nie są pozbawione wad. Jednym z problemów jest trudność w uczeniu długotrwałych zależności, ponieważ gradienty mogą zanikać lub eksplodować w czasie. W praktyce często stosuje się różne techniki, takie jak LSTM czy GRU, aby radzić sobie z tym problemem. Ponadto, obliczenia w rekurencyjnych sieciach neuronowych są bardziej czasochłonne niż w przypadku sieci jednokierunkowych, co może stanowić wyzwanie w przypadku dużych zbiorów danych.\\\\
 Podsumowując, rekurencyjne sieci neuronowe są potężnym narzędziem do analizy danych sekwencyjnych. Dzięki swojej zdolności do uwzględniania kontekstu historycznego, są one szczególnie skuteczne w modelowaniu danych sekwencyjnych. Jednak ich skomplikowana natura i trudności w uczeniu długotrwałych zależności wymagają starannego projektowania i optymalizacji.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/rnn.png}
+        \caption{Obrazek przedstawia schemat działania Recurrent Neural Network.}
+        \label{fig:mesh1}
+    \end{figure}
+    \pagebreak
     \subsection{LSTM}
     LSTM (Long Short-Term Memory) to rodzaj rekurencyjnej jednostki używanej w rekurencyjnych sieciach neuronowych (RNN), która rozwiązuje problem znikającego gradientu. Składa się z bramek wejściowej, zapominającej i wyjściowej, które kontrolują przepływ informacji. Jednostka LSTM ma zdolność do przechowywania informacji przez wiele kroków czasowych dzięki mechanizmowi "ścieżki pamięci"
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/lstm.png}
+        \caption{Obrazek przedstawia schemat działania Long-Short Term Memory.}
+        \label{fig:mesh1}
+    \end{figure}
+    \pagebreak
     \subsection{GRU}
     GRU (Gated Recurrent Unit) to rodzaj jednostki w rekurencyjnych sieciach neuronowych (RNN), której struktura obejmuje bramki resetowania i aktualizacji. Działa podobnie do LSTM, umożliwiając skuteczne modelowanie długotrwałych zależności w danych sekwencyjnych. GRU ma mniejszą liczbę parametrów niż LSTM, a mimo to osiąga podobne efektywności. Jest popularnym rozwiązaniem w przetwarzaniu języka naturalnego, rozpoznawaniu mowy i generowaniu tekstu.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/rnn.png}
+        \caption{Obrazek przedstawia schemat działania Gated Recurrent Unit.}
+        \label{fig:mesh1}
+    \end{figure}
+    \pagebreak
     \subsection{Różnice między LSTM, a GRU}
     GRU i LSTM są dwoma popularnymi typami jednostek w rekurencyjnych sieciach neuronowych (RNN). GRU ma prostszą strukturę, mniejszą liczbę parametrów i bramki resetowania. LSTM ma bardziej złożoną strukturę, oddzielną komórkę pamięci i trzy bramki. Wybór między nimi zależy od kontekstu i danych sekwencyjnych.
     \subsection{Problem znikającego gradientu}
@@ -227,4 +248,94 @@ Podsumowując, rekurencyjne sieci neuronowe są potężnym narzędziem do analiz
 Podstawowym celem embedingu w RNN jest przechwycenie znaczenia słów lub sekwencji słów w sposób, który umożliwia modelowi RNN efektywne przetwarzanie i wnioskowanie na podstawie tych danych. Embeddingi są trenowane wraz z resztą sieci RNN i są aktualizowane podczas procesu uczenia. \\\\
 Proces embedingu zaczyna poprzez przypisania do unikalnego wektora liczba rzeczywistych dla każdego słowa, losowych wartości. Będą one aktualizowane podczas uczenia, aby zwiększyć strukturę symetralną języka. Istotną kwestią jest aby słowa o podobnym znaczeniu miały bliskie sobie wektory, dzięki czemu model RNN może wykrywać podobieństwa i zależności między słowami w trakcie analizy tekstu.
 
+\newpage
+\section{Sieci neuronowe na transformatorach}
+\subsection{Przykładowe wykorzystanie sieci neuronowych na transformatoarach:}
+    \begin{itemize}
+        \item przewidywania kolejnego słowa
+        \item tłumaczenia z innego języka
+        \item odpowiadania na pytania
+        \item podsumowywania dokumentu
+        \item parafrazowania
+        \item tworzenia nowego tekstu
+        \item gry w szachy
+        i wielu innych 
+    \end{itemize}
+Modele językowe takie jak BERT, GPT-2 czy GPT-3 wykorzystują właśnie transformatory. Ale przyjżyjmy się jak działa transformator?
+\subsection{Analiza działania transformera:}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/Schemat-dzialania.png}
+        \caption{Obrazek przedstawia schemat działania tranformera z opisami potrzebnymi do dalszego opisu.}
+        \label{fig:mesh1}
+    \end{figure}
+    \begin{description}
+      \item[1A] \hfill \\
+      Embedding (osadzenie) to proces zamiany słów na liczby lub wektory, które można przetwarzać za pomocą modelu. Słowa są mapowane na przestrzeń wielowymiarową, gdzie podobne słowa są blisko siebie, a różne słowa są oddalone od siebie. Embedding jest podstawowym krokiem w procesie przetwarzania tekstu w modelach językowych.
+      \item[1B ] \hfill \\
+      Positional encoding (kodowanie pozycyjne) to technika, która dodaje informację o pozycji słowa do jego osadzenia (embedding). Pozwala to modelowi uwzględnić kontekst i kolejność słów w zdaniu. Wektory kodowania pozycji są dodawane do wektorów embeddingowych, aby utworzyć reprezentację wektorową słowa z uwzględnieniem kontekstu.
+      \item[2A ] \hfill \\
+      Multi-head attention to mechanizm, który pozwala modelowi na skupienie się na różnych częściach zdania jednocześnie. Jest obliczany dla każdego słowa i bierze pod uwagę zarówno samo słowo, jak i kontekst między słowami. W efekcie otrzymujemy wektor uwagi dla każdego słowa.
+      \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/wektor-uwagi.png}
+        \caption{Obrazek przedstawia schemat działania wekotra uwagi.}
+        \label{fig:mesh1}
+    \end{figure}
+      \item[2B  ] \hfill \\
+      Feed-forward network (sieć jednokierunkowa) to warstwa w transformerze, która przekształca wektory uwagi dla każdego słowa. Każdy wektor jest przekazywany przez sieć wielowarstwową, która działa niezależnie dla każdego słowa. Ten proces można zrównoleglić, co przyspiesza obliczenia.
+      \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/siec-wielowarstowa.png}
+        \caption{Obrazek przedstawia schemat działania wekotra uwagi.}
+        \label{fig:mesh1}
+    \end{figure}
+      \item[3A i 3B ] \hfill \\
+      W tych krokach powtarza się proces opisany w 1A i 1B. Dane wejściowe to wynikowe zdanie, a wynikiem jest zaktualizowana reprezentacja wektorowa zdania z uwzględnieniem kontekstu i pozycji słów.
+      \item[4A  ] \hfill \\
+      Masked multi-head attention (uwaga wielogłowicowa z maskowaniem) jest wykorzystywana w dekoderze modelu transformerowego. Maskowanie pozwala na przetwarzanie sekwencji w sposób sekwencyjny, bez łamania kierunku czasowego. Modele transformers z maskowaniem mogą generować predykcje sekwencyjne, nie mając informacji o przyszłych elementach sekwencji.
+      \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/maska.png}
+        \caption{Obrazek przedstawia schemat działania maskowania na przykładzie zdania po języku hiszpańskim, które ma być przetłumaczone na inny język.}
+        \label{fig:mesh1}
+    \end{figure}
+      \item[4B ] \hfill \\
+      Multi-head attention w dekoderze to proces porównywania wektorów uwagi między dekoderem a enkoderem. Sprawdza on jakość powiązania między wektorami słów w obu częściach modelu, aby model mógł zrozumieć, jak różne słowa są ze sobą powiązane.
+      \item[4C  ] \hfill \\
+      Feed-forward network jest ponownie stosowane w dekoderze w celu uproszczenia wektorów uwagi i ułatwienia dalszego przetwarzania przez model.
+      \item[5 ] \hfill \\
+      Na końcu wynik z transformera przekazywany jest przez warstwę liniową (linear layer), która przekształca wyniki w wymiarze odpowiadającym liczbie słów w zdaniu. Następnie funkcja softmax zamienia wyniki w prawdopodobieństwa, które można interpretować jako pewność modelu co do przynależności słów do różnych kategorii lub etykiet.
+    \end{description}
+\subsection{Wady i zalety:}
+    \begin{description}
+      \item[Zalety] \hfill \\
+      Główną zaletą transformerów jest szybkość działania w porównaniu z siecią RNN lub LSTM. Ponadto elementem, który wpływa na to, że coraz chętniej się po nie sięga, są dużo lepsze wyniki w porównaniu z innymi algorytmami.
+      \item[Wady] \hfill \\      
+        \begin{itemize}
+          \item potrzeba dużej mocy obliczeniowej, aby zostały wytrenowane
+          \item potrzeba naprawdę dużej ilości danych do wytrenowania
+          \item dostępne są przykłady, że gorzej sobie radzą z hierarchicznymi danymi
+          \item w związku z tym, że są stosunkowo nowe, to w przypadku błędów możliwe, że informacja o jego naprawieniu będzie ciężka do znalezienia w internecie.
+        \end{itemize}
+    \end{description}
+\newpage
+\section{GPT-2}
+GPT-2 (Generative Pre-trained Transformer 2) to zaawansowany model językowy oparty na architekturze transformer. Został opracowany przez OpenAI i jest jednym z najbardziej znanych i potężnych modeli generatywnych opartych na uczeniu maszynowym.\\\\
+GPT-2 ma zdolność do generowania wysokiej jakości tekstu, co sprawia, że jest bardzo przydatny w różnych zastosowaniach, takich jak generowanie treści, redagowanie, tłumaczenie i wiele innych. Model ten został wytrenowany na ogromnych zbiorach danych tekstowych z internetu, co pozwoliło mu na zdobycie ogromnej wiedzy na temat języka naturalnego.\\\\
+Jednym z kluczowych elementów GPT-2 jest jego zdolność do kontekstowego rozumienia tekstu. Dzięki warstwom transformer i mechanizmowi uwagi, model jest w stanie analizować kontekst i zależności między słowami, co prowadzi do generowania bardziej spójnych i sensownych tekstów.\\\\
+GPT-2 wykorzystuje uczenie nienadzorowane, co oznacza, że jest trenowany na dużych zbiorach danych bez konkretnych etykiet czy celów zadania. Wytrenowany model jest w stanie generować teksty na podstawie danego kontekstu, a jakość generacji zależy od jakości danych treningowych i rozmiaru modelu.\\\\
+Warto zaznaczyć, że GPT-2 ma również pewne ograniczenia. Ze względu na to, że jest oparty na uczeniu maszynowym nienadzorowanym, może generować nieodpowiednie, niepoprawne lub niezgodne z rzeczywistością treści, co dla niektórych niestety może być zaletą. Ponadto, model może być podatny na wprowadzanie błędnych informacji, które znalazły się w danych treningowych.\\\\
+\textbf{Jako generator obrazów}\\\\
+W tym momencie GPT jest wykorzystywany również jako generator obrazów. Nieco ponad miesiąc po premierze GPT-3, superpotężnego algorytmu generującego tekst, jego poprzednik – GPT-2 – znalazł nowe wcielenie. Jego twórcy postanowili sprawdzić, jak ich model zachowałby się, gdyby wyszkolić go nie na terabajtach tekstu, ale na milionach fotografii.\\\\
+Otóż modele typu Transformer, do których należy GPT-2, określa się jako domain-agnostic, czyli niezależne od przetwarzanych danych. Oznacza to, że model teoretycznie zadziała dla każdych danych, które można zamienić na jednowymiarową sekwencję.\\\\
+Tekst jest taką sekwencją z natury, ale co z dwuwymiarowym obrazem? Żeby to zadziałało, trzeba go było rozłożyć na czynniki pierwsze – obraz został „linijka po linijce” zapisany jako ciąg pikseli. Każdy piksel z osobna został zakodowany w specjalnie zaprojektowanym dziewięciobitowym systemie określania koloru.\\\\
+Okazało się, że algorytm działający na jednowymiarowych sekwencjach danych, którego działanie w wielkim uproszczeniu sprowadza się do przewidywania kolejnego elementu układanki z zachowaniem kontekstu całości, świetnie sprawdza się także w generowaniu dwuwymiarowych obrazów.\\\\
+Jeśli dać mu fragmet obrazu to wytworzy spójny stylistycznie ciąg dalszy i to w różnych wariantach. To nie ma na celu odtworzenie orginału, ale coś nowego o różnych wariantach. Efekt jest analogiczny jak w przypadku generowania tekstu – dalszy ciąg jest całkowicie zmyślony, ale stylistycznie spójny z początkowym fragmentem. Próbki działania algorytmu można zobaczyć na poniższej ilustracji.
+\begin{figure}[h]
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/obrazki.png}
+        \caption{Obrazek przedstawia schemat działania gpt-2 na obrazach.}
+        \label{fig:mesh1}
+    \end{figure}
 \end{document}
