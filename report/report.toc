@@ -1,0 +1,40 @@
+\babel@toc {polish}{}\relax 
+\contentsline {section}{\numberline {1}Wstęp}{3}{section.1}%
+\contentsline {section}{\numberline {2}Łańcuchy Markova}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Wstęp}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Prawo Zipfa}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Prawo Heapsa}{9}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Entropia Krzyżowa}{11}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Perpleksja}{12}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Self-BLEU}{13}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Przykładowe wyniki}{14}{subsection.2.7}%
+\contentsline {section}{\numberline {3}Rekurencyjne Sieci Neuronowe}{16}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Wstęp o rekurencyjnych sieciach neuronowych}{16}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}LSTM}{17}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}GRU}{18}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Różnice między LSTM, a GRU}{19}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Problem znikającego gradientu}{19}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Embedding}{19}{subsection.3.6}%
+\contentsline {section}{\numberline {4}Sieci neuronowe na transformatorach}{21}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Przykładowe wykorzystanie sieci neuronowych na transformatoarach:}{21}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Analiza działania transformera:}{21}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Wady i zalety:}{23}{subsection.4.3}%
+\contentsline {section}{\numberline {5}GPT-2}{25}{section.5}%
+\contentsline {section}{\numberline {6}Realizacja praktyczna z wykorzystaniem RNN}{27}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Użyte narzędzia}{27}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Struktura kodu}{27}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Dane uczące}{27}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Modele RNN}{28}{subsection.6.4}%
+\contentsline {subsubsection}{\numberline {6.4.1}default\_lstm}{28}{subsubsection.6.4.1}%
+\contentsline {paragraph}{Przykład generacji}{28}{section*.18}%
+\contentsline {subsubsection}{\numberline {6.4.2}beta\_lstm}{29}{subsubsection.6.4.2}%
+\contentsline {paragraph}{Przykład generacji}{29}{section*.20}%
+\contentsline {subsubsection}{\numberline {6.4.3}gamma\_lstm}{30}{subsubsection.6.4.3}%
+\contentsline {paragraph}{Przykład generacji}{30}{section*.22}%
+\contentsline {subsubsection}{\numberline {6.4.4}omicron\_lstm}{31}{subsubsection.6.4.4}%
+\contentsline {paragraph}{Przykład generacji}{31}{section*.24}%
+\contentsline {subsubsection}{\numberline {6.4.5}default\_gru}{32}{subsubsection.6.4.5}%
+\contentsline {paragraph}{Przykład generacji}{32}{section*.26}%
+\contentsline {subsubsection}{\numberline {6.4.6}beta\_gru}{33}{subsubsection.6.4.6}%
+\contentsline {paragraph}{Przykład generacji}{33}{section*.28}%
+\contentsline {subsubsection}{\numberline {6.4.7}Dotrenowany model GPT-2}{34}{subsubsection.6.4.7}%

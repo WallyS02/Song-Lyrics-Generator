@@ -9,6 +9,14 @@
 \usepackage{placeins}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows}
+
+\tikzstyle{terminator} = [rectangle, draw, text centered, rounded corners, minimum height=2em]
+\tikzstyle{process} = [rectangle, draw, text centered, minimum height=2em]
+\tikzstyle{decision} = [diamond, draw, text centered, minimum height=2em]
+\tikzstyle{data}=[trapezium, draw, text centered, trapezium left angle=60, trapezium right angle=120, minimum height=2em]
+\tikzstyle{connector} = [draw, -latex']
 
 \title{Generacja tekstów piosenek}
 \author{Maciej Krzyżanowski, Sebastian Kutny, Tomasz Lewandowski}
@@ -338,4 +346,264 @@ Jeśli dać mu fragmet obrazu to wytworzy spójny stylistycznie ciąg dalszy i t
         \caption{Obrazek przedstawia schemat działania gpt-2 na obrazach.}
         \label{fig:mesh1}
     \end{figure}
+\pagebreak
+\section{Realizacja praktyczna z wykorzystaniem RNN}
+\subsection{Użyte narzędzia}
+\begin{itemize}
+	\item Python3
+	\item Tensorflow
+	\item Keras i Keras\_NLP
+	\item Embedding GloVe (6B.100d)
+	\item Gotowy model GPT-2 (za pomocą pakietu gpt\_2\_simple)
+	\item Teksty piosenek AC/DC, Metalliki i Jimiego Hendrixa
+\end{itemize}
+\subsection{Struktura kodu}
+\begin{itemize}
+	\item main.py - plik obsługujący pobieranie danych od użytkownika i wykorzystujący inne moduły do ładowania i trenowania lub generacji tekstów z modeli.
+	\item models.py - zawiera definicje poniżej opisanych modeli.
+	\item data\_processor.py - impementacja klasy służącej do obróbki danych m.in. przygotowania danych treningowych i testowych
+	\item song\_generator.py - generator piosenek, który wykorzystuje przekazany model i instancję klasy DataProcessor
+	\item edit\_distances.py - kod obliczający metryki edit distance
+	\item plots.py - kod rysujący wykresy metryk
+	\item transformer.py - kod trenujący i generujący piosenki za pomocą GPT-2
+\end{itemize}
+\subsection{Dane uczące}
+Zbiory danych wykorzystane do treningu i oceny rekurencyjnych sieci neuronowych to łącznie kilkaset tekstów utworów:
+\begin{itemize}
+	\item Tekty piosenek AC/DC do treningu sieci opartych o LSTM lub GRU (ac\_dc.csv)
+	\item Połączenie tekstów Metalliki i Hendrixa do dotrenowania modelu GPT-2 (metallica\_hendrix.txt)
+\end{itemize}
+\newpage
+\subsection{Modele RNN}
+Opisując metrykę Edit Distance wartości rozdzielone średnikami oznaczają generacje odpowiednio dla 4 wersów po 6 słów, 2 wersów po 6 słów, 1 wersu składajacego się z 6 słów i 1 wersu składającego się z 2 słów.
+\subsubsection{default\_lstm}
+\textbf{Warstwy modelu} \\ \\
+\begin{tikzpicture}[node distance = 2.2cm]
+	\node [process, fill=blue!20] (we) {\textbf{We}};
+	\node [process, fill=green!20, right of=we] (lstm1) {LSTM(256)};
+	\node [process, fill=green!20, right of=lstm1] (dropout1) {Dropout(0.2)};
+	\node [process, fill=green!20, right of=dropout1] (lstm2) {LSTM(256)};
+	\node [process, fill=green!20, right of=lstm2] (dropout2) {Dropout(0.2)};
+	\node [process, fill=blue!20, right of=dropout2] (wy) {\textbf{Wy}};
+	\path [connector] (we) -- (lstm1);
+	\path [connector] (lstm1) -- (dropout1);
+	\path [connector] (dropout1) -- (lstm2);
+	\path [connector] (lstm2) -- (dropout2);
+	\path [connector] (dropout2) -- (wy);
+\end{tikzpicture} \\ \\
+\textbf{Ocena modelu}
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{default_lstm}}%
+	\caption{Metryki modelu default\_lstm}
+	\label{fig:default_lstm}
+\end{figure}
+\FloatBarrier
+Wynik edit distance (po normalizacji) dla w pełni wytrenowanego modelu: \\
+Średni ED: 0.98 ; 0.97 ; 0.95 ; 0.8125 \\
+Minimalny ED: 0.88 ; 0.83 ; 0.67 ; 0.0 \\
+Maksymalny ED: 1.0 ; 1.0 ; 1.0 ; 1.0 \\
+\paragraph{Przykład generacji}
+\leavevmode\\
+\textsl{
+	Of broad for the way she’s \\
+	Love out the gotta rock all \\
+	Reputation up all yeah on down \\
+	Finally oh a man you gotta}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
+\newpage
+\subsubsection{beta\_lstm}
+\textbf{Warstwy modelu} \\ \\
+\begin{tikzpicture}[node distance = 2.4cm]
+	\node [process, fill=blue!20] (we) {\textbf{We}};
+	\node [process, fill=green!20, right of=we] (lstm1) {LSTM(256)};
+	\node [process, fill=green!20, right of=lstm1] (dropout1) {Dropout(0.36)};
+	\node [process, fill=green!20, right of=dropout1] (lstm2) {LSTM(256)};
+	\node [process, fill=green!20, right of=lstm2] (dropout2) {Dropout(0.2)};
+	\node [process, fill=blue!20, right of=dropout2] (wy) {\textbf{Wy}};
+	\path [connector] (we) -- (lstm1);
+	\path [connector] (lstm1) -- (dropout1);
+	\path [connector] (dropout1) -- (lstm2);
+	\path [connector] (lstm2) -- (dropout2);
+	\path [connector] (dropout2) -- (wy);
+\end{tikzpicture} \\ \\
+\textbf{Ocena modelu}
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{beta_lstm}}%
+	\caption{Metryki modelu beta\_lstm}
+	\label{fig:beta_lstm}
+\end{figure}
+\FloatBarrier
+Wynik edit distance (po normalizacji) dla w pełni wytrenowanego modelu: \\
+Średni ED: 0.98 ; 0.98 ; 0.99 ; 0.97 \\
+Minimalny ED: 0.91 ; 0.92 ; 0.83 ; 0.5 \\
+Maksymalny ED: 1.0 ; 1.0 ; 1.0 ; 1.0 \\
+\paragraph{Przykład generacji}
+\leavevmode\\
+\textsl{
+	Blood sideway up a right I'm \\
+	Up love and fight got the \\
+	Dark oh rock a with feel \\
+	What go come your a can}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
+\newpage
+\subsubsection{gamma\_lstm}
+\textbf{Warstwy modelu} \\ \\
+\begin{tikzpicture}[node distance = 2.4cm]
+	\node [process, fill=blue!20] (we) {\textbf{We}};
+	\node [process, fill=green!20, right of=we] (lstm1) {LSTM(512)};
+	\node [process, fill=green!20, right of=lstm1] (dropout1) {Dropout(0.2)};
+	\node [process, fill=green!20, right of=dropout1] (lstm2) {LSTM(512)};
+	\node [process, fill=green!20, right of=lstm2] (dropout2) {Dropout(0.2)};
+	\node [process, fill=blue!20, right of=dropout2] (wy) {\textbf{Wy}};
+	\path [connector] (we) -- (lstm1);
+	\path [connector] (lstm1) -- (dropout1);
+	\path [connector] (dropout1) -- (lstm2);
+	\path [connector] (lstm2) -- (dropout2);
+	\path [connector] (dropout2) -- (wy);
+\end{tikzpicture} \\ \\
+\textbf{Ocena modelu}
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{gamma_lstm}}%
+	\caption{Metryki modelu gamma\_lstm}
+	\label{fig:gamma_lstm}
+\end{figure}
+\FloatBarrier
+Wynik edit distance (po normalizacji) dla w pełni wytrenowanego modelu: \\
+Średni ED: 0.98 ; 0.97 ; 0.99 ; 1.0 \\
+Minimalny ED: 0.83 ; 0.83 ; 0.83 ; 1.0 \\
+Maksymalny ED: 1.0 ; 1.0 ; 1.0 ; 1.0 \\
+\paragraph{Przykład generacji}
+\leavevmode\\
+\textsl{
+	You got her this it the \\
+	Fire what we're like chorus me \\
+	All come she yeah the way \\
+	She’s commin’ all the way prowler}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
+\newpage
+\subsubsection{omicron\_lstm}
+\textbf{Warstwy modelu} \\ \\
+\begin{tikzpicture}[node distance = 0.75cm]
+	\node [process, fill=blue!20] (we) {\textbf{We}};
+	\node [process, fill=yellow!20, below of=we] (glove) {GloVe.6B.100d};
+	\node [process, fill=green!20, below of=glove] (lstm1) {LSTM(512)};
+	\node [process, fill=green!20, below of=lstm1] (dropout1) {Dropout(0.2)};
+	\node [process, fill=green!20, below of=dropout1] (lstm2) {LSTM(512)};
+	\node [process, fill=green!20, below of=lstm2] (dropout2) {Dropout(0.2)};
+	\node [process, fill=blue!20, below of=dropout2] (wy) {\textbf{Wy}};
+	\path [connector] (we) -- (glove);
+	\path [connector] (glove) -- (lstm1);
+	\path [connector] (lstm1) -- (dropout1);
+	\path [connector] (dropout1) -- (lstm2);
+	\path [connector] (lstm2) -- (dropout2);
+	\path [connector] (dropout2) -- (wy);
+\end{tikzpicture} \\ \\
+\textbf{Ocena modelu}
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{omicron_lstm}}%
+	\caption{Metryki modelu omicron\_lstm}
+	\label{fig:omicron_lstm}
+\end{figure}
+\FloatBarrier
+\paragraph{Przykład generacji}
+\leavevmode\\
+\textsl{
+	Twilight sting time who crown pain \\
+	In a legless need no tears \\
+	Yours a take yours lovin' million \\
+	Woods lovin' trip a hearts that}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
+\newpage
+\subsubsection{default\_gru}
+\textbf{Warstwy modelu} \\ \\
+\begin{tikzpicture}[node distance = 2.2cm]
+	\node [process, fill=blue!20] (we) {\textbf{We}};
+	\node [process, fill=green!20, right of=we] (lstm1) {GRU(256)};
+	\node [process, fill=green!20, right of=lstm1] (dropout1) {Dropout(0.2)};
+	\node [process, fill=green!20, right of=dropout1] (lstm2) {GRU(256)};
+	\node [process, fill=green!20, right of=lstm2] (dropout2) {Dropout(0.2)};
+	\node [process, fill=blue!20, right of=dropout2] (wy) {\textbf{Wy}};
+	\path [connector] (we) -- (lstm1);
+	\path [connector] (lstm1) -- (dropout1);
+	\path [connector] (dropout1) -- (lstm2);
+	\path [connector] (lstm2) -- (dropout2);
+	\path [connector] (dropout2) -- (wy);
+\end{tikzpicture} \\ \\
+\textbf{Ocena modelu}
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{default_gru}}%
+	\caption{Metryki modelu default\_gru}
+	\label{fig:default_gru}
+\end{figure}
+\FloatBarrier
+Wynik edit distance (po normalizacji) dla w pełni wytrenowanego modelu: \\
+Średni ED: 0.99 ; 0.99 ; 0.99 ; 1.0 \\
+Minimalny ED: 0.96 ; 0.92 ; 0.83 ; 1.0 \\
+Maksymalny ED: 1.0 ; 1.0 ; 1.0 ; 1.0
+\paragraph{Przykład generacji}
+\leavevmode\\
+\textsl{
+	Sunset but got on have call \\
+	I pull shook oh a can \\
+	Of conduct known back satisfy out \\
+	You bustin' himself the handful run}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
+\newpage
+\subsubsection{beta\_gru}
+\textbf{Warstwy modelu} \\ \\
+\begin{tikzpicture}[node distance = 2.2cm]
+	\node [process, fill=blue!20] (we) {\textbf{We}};
+	\node [process, fill=green!20, right of=we] (lstm1) {GRU(128)};
+	\node [process, fill=green!20, right of=lstm1] (dropout1) {Dropout(0.2)};
+	\node [process, fill=green!20, right of=dropout1] (lstm2) {GRU(128)};
+	\node [process, fill=green!20, right of=lstm2] (dropout2) {Dropout(0.2)};
+	\node [process, fill=blue!20, right of=dropout2] (wy) {\textbf{Wy}};
+	\path [connector] (we) -- (lstm1);
+	\path [connector] (lstm1) -- (dropout1);
+	\path [connector] (dropout1) -- (lstm2);
+	\path [connector] (lstm2) -- (dropout2);
+	\path [connector] (dropout2) -- (wy);
+\end{tikzpicture} \\ \\
+\textbf{Ocena modelu}
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{beta_gru}}%
+	\caption{Metryki modelu beta\_gru}
+	\label{fig:beta_gru}
+\end{figure}
+\FloatBarrier
+Wynik edit distance (po normalizacji) dla w pełni wytrenowanego modelu: \\
+Średni ED: 0.98 ; 0.96 ; 0.99 ; 1.0 \\
+Minimalny ED: 0.92 ; 0.83 ; 0.83 ; 1.0 \\
+Maksymalny ED: 1.0 ; 1.0 ; 1.0 ; 1.0 \\
+\paragraph{Przykład generacji}
+\leavevmode\\
+\textsl{
+	Into from rock way down the \\
+	Way the go jack which train \\
+	Play when down just I'm the \\
+	Way restless makin' and like damnation}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
+\newpage
+\subsubsection{Dotrenowany model GPT-2}
+Do generacji określonego rodzaju tekstów można też wykorzystać już gotowe modele. Jednym z nich jest wcześniej opisany GPT-2.
+Wykorzystując pakiet gpt-2-simple dotrenowaliśmy model wykorzystując połączenie zbioru piosenek Metalliki i Jimiego Hendrixa.
+Poniżej znajduje się przykład generacji tekstu przez takie rozwiązanie: \\
+\leavevmode\\
+\textsl{
+	Got to stay up through tonight \\
+	Nobody's fool around tonight \\
+	Yeah, yeah, ya better get over yourself \\
+	Yeah, ya better get over yourself \\
+	Everybody's gotta live together \\
+	Under the same bed \\
+	Every night \\
+	Night falls over o'er the Sun}
+\leavevmode\\\leavevmode\\
+\leavevmode\\
 \end{document}
